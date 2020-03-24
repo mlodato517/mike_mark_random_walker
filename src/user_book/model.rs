@@ -4,7 +4,10 @@ pub struct UserBook {
     user_id: String,
 }
 impl UserBook {
-    pub fn new(book_id: String, user_id: String) -> Self {
-        UserBook { book_id, user_id }
+    pub fn new(book_id: &str, user_id: &str) -> Self {
+        UserBook {
+            book_id: book_id.to_owned(),
+            user_id: user_id.to_owned(),
+        }
     }
 }

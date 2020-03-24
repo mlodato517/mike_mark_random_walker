@@ -16,14 +16,11 @@ fn read_users(filename: &str) -> std::io::Result<()> {
     let user_books = reader
         .lines()
         .skip(1)
+        .map(|line| line.unwrap())
         .map(|line| {
-            line.ok()
-                .unwrap()
-                .split(',')
-                .map(String::from)
-                .collect::<Vec<String>>()
+            let ids = line.split(',').collect::<Vec<&str>>();
+            UserBook::new(ids[1], ids[0])
         })
-        .map(|ids| UserBook::new(ids[1].to_owned(), ids[0].to_owned()))
         .collect::<Vec<UserBook>>();
 
     println!("{:#?}", user_books);
