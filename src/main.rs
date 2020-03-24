@@ -16,7 +16,7 @@ fn read_users(filename: &str) -> std::io::Result<()> {
     let user_books = reader.lines()
         .skip(1)
         .map(|line| {
-            line.ok().unwrap().split(',').map(|part| String::from(part)).collect::<Vec<String>>()
+            line.ok().unwrap().split(',').map(String::from).collect::<Vec<String>>()
         })
         .map(|ids| UserBook::new(ids[1].to_owned(), ids[0].to_owned()))
         .collect::<Vec<UserBook>>();
