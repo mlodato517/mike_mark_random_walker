@@ -6,23 +6,19 @@ pub mod models;
 use models::user_book::UserBook;
 
 fn main() -> std::io::Result<()> {
-    read_users("foo.csv")
+    let user_book_ids = read_csv("foo.csv")?;
+    let _user_books = UserBook::from_collection(user_book_ids);
+    Ok(())
 }
 
-fn read_users(filename: &str) -> std::io::Result<()> {
+fn read_csv(filename: &str) -> std::io::Result<Vec<Vec<String>>> {
     let f = File::open(filename)?;
     let reader = BufReader::new(f);
 
-    let user_books = reader
+    Ok(reader
         .lines()
         .skip(1)
         .map(|line| line.unwrap())
-        .map(|line| {
-            let ids = line.split(',').collect::<Vec<&str>>();
-            UserBook::new(ids[1], ids[0])
-        })
-        .collect::<Vec<UserBook>>();
-
-    println!("{:#?}", user_books);
-    Ok(())
+        .map(|line| line.split(',').map(String::from).collect::<Vec<String>>())
+        .collect())
 }
