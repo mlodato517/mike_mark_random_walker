@@ -2,8 +2,8 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
 
-pub mod user_book;
-use user_book::model::UserBook;
+pub mod models;
+use models::user_book::UserBook;
 
 fn main() -> std::io::Result<()> {
     read_users("foo.csv")
