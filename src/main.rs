@@ -6,7 +6,7 @@ pub mod models;
 use models::user_book::UserBook;
 
 fn main() -> std::io::Result<()> {
-    let user_book_ids = read_csv("foo.csv")?;
+    let user_book_ids = read_csv("user_books.csv")?;
     let _user_books = UserBook::from_collection(user_book_ids);
     Ok(())
 }
