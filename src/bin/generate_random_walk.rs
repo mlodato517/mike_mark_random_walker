@@ -53,6 +53,14 @@ struct Opt {
         default_value = "output.txt"
     )]
     output_filename: String,
+
+    #[structopt(
+        short = "s",
+        long = "strategy",
+        help = "Walking strategy - 'metapath' or 'random'",
+        default_value = "metapath"
+    )]
+    strategy: String,
 }
 
 pub fn main() {
@@ -66,6 +74,7 @@ pub fn main() {
         &opt.output_filename,
         opt.iterations_per_user,
         opt.walks_per_line,
+        &opt.strategy,
     );
 
     println!("Done! Took {}ms", start.elapsed().as_millis());

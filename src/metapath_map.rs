@@ -1,12 +1,13 @@
-use rand::Rng;
+use super::ids::{COL_1_PREFIX, COL_2_PREFIX, COL_3_PREFIX, COL_4_PREFIX};
 use std::collections::{HashMap, HashSet};
 use std::io::BufRead;
 
 type Lines = Vec<Vec<String>>;
-type Map = Vec<Vec<u16>>;
+pub type Map = Vec<Vec<u16>>;
+pub type NonPrefixedId = [u8; 4];
 
 pub struct MetapathMap {
-    base64_cache: Vec<[u8; 3]>,
+    base64_cache: Vec<NonPrefixedId>,
     col_1_to_2_map: Map,
     col_2_to_3_map: Map,
     col_3_to_4_map: Map,
@@ -53,72 +54,64 @@ impl MetapathMap {
         }
     }
 
-    pub fn col_1_ids(&self) -> impl Iterator<Item = usize> {
-        0..self.col_1_to_2_map.len()
+    pub fn short_col_1_ids(&self) -> impl Iterator<Item = u16> {
+        (0..self.col_1_to_2_map.len()).map(|n| n as u16)
     }
 
-    pub fn random_col_2_id_for_col_1_id<R>(&self, col_1_id: u16, rng: &mut R) -> u16
-    where
-        R: Rng,
-    {
-        let col_2_list = &self.col_1_to_2_map[col_1_id as usize];
-        col_2_list[rng.gen_range(0, col_2_list.len())]
+    pub fn get_col_1_to_2_map(&self) -> &Map {
+        &self.col_1_to_2_map
     }
 
-    pub fn random_col_3_id_for_col_2_id<R>(&self, col_2_id: u16, rng: &mut R) -> u16
-    where
-        R: Rng,
-    {
-        let col_3_list = &self.col_2_to_3_map[col_2_id as usize];
-        col_3_list[rng.gen_range(0, col_3_list.len())]
+    pub fn get_col_2_to_3_map(&self) -> &Map {
+        &self.col_2_to_3_map
     }
 
-    pub fn random_col_4_id_for_col_3_id<R>(&self, col_3_id: u16, rng: &mut R) -> u16
-    where
-        R: Rng,
-    {
-        let col_4_list = &self.col_3_to_4_map[col_3_id as usize];
-        col_4_list[rng.gen_range(0, col_4_list.len())]
+    pub fn get_col_3_to_4_map(&self) -> &Map {
+        &self.col_3_to_4_map
     }
 
-    pub fn random_col_3_id_for_col_4_id<R>(&self, col_4_id: u16, rng: &mut R) -> u16
-    where
-        R: Rng,
-    {
-        let col_3_list = &self.col_4_to_3_map[col_4_id as usize];
-        col_3_list[rng.gen_range(0, col_3_list.len())]
+    pub fn get_col_4_to_3_map(&self) -> &Map {
+        &self.col_4_to_3_map
     }
 
-    pub fn random_col_2_id_for_col_3_id<R>(&self, col_3_id: u16, rng: &mut R) -> u16
-    where
-        R: Rng,
-    {
-        let col_2_list = &self.col_3_to_2_map[col_3_id as usize];
-        col_2_list[rng.gen_range(0, col_2_list.len())]
+    pub fn get_col_3_to_2_map(&self) -> &Map {
+        &self.col_3_to_2_map
     }
 
-    pub fn random_col_1_id_for_col_2_id<R>(&self, col_2_id: u16, rng: &mut R) -> u16
-    where
-        R: Rng,
-    {
-        let col_1_list = &self.col_2_to_1_map[col_2_id as usize];
-        col_1_list[rng.gen_range(0, col_1_list.len())]
+    pub fn get_col_2_to_1_map(&self) -> &Map {
+        &self.col_2_to_1_map
     }
 
-    pub fn col_1_id(&self, col_1_idx: u16) -> [u8; 3] {
-        self.base64_cache[col_1_idx as usize]
+    pub fn encoded_col_1_id(&self, col_1_idx: u16) -> [u8; 4] {
+        let mut non_prefixed_id = self.base64_cache[col_1_idx as usize];
+        non_prefixed_id[0] = COL_1_PREFIX;
+
+        let prefixed_id = non_prefixed_id;
+        prefixed_id
     }
 
-    pub fn col_2_id(&self, col_2_idx: u16) -> [u8; 3] {
-        self.base64_cache[col_2_idx as usize]
+    pub fn encoded_col_2_id(&self, col_2_idx: u16) -> [u8; 4] {
+        let mut non_prefixed_id = self.base64_cache[col_2_idx as usize];
+        non_prefixed_id[0] = COL_2_PREFIX;
+
+        let prefixed_id = non_prefixed_id;
+        prefixed_id
     }
 
-    pub fn col_3_id(&self, col_3_idx: u16) -> [u8; 3] {
-        self.base64_cache[col_3_idx as usize]
+    pub fn encoded_col_3_id(&self, col_3_idx: u16) -> [u8; 4] {
+        let mut non_prefixed_id = self.base64_cache[col_3_idx as usize];
+        non_prefixed_id[0] = COL_3_PREFIX;
+
+        let prefixed_id = non_prefixed_id;
+        prefixed_id
     }
 
-    pub fn col_4_id(&self, col_4_idx: u16) -> [u8; 3] {
-        self.base64_cache[col_4_idx as usize]
+    pub fn encoded_col_4_id(&self, col_4_idx: u16) -> [u8; 4] {
+        let mut non_prefixed_id = self.base64_cache[col_4_idx as usize];
+        non_prefixed_id[0] = COL_4_PREFIX;
+
+        let prefixed_id = non_prefixed_id;
+        prefixed_id
     }
 
     fn get_split_lines<R>(file: R) -> Lines
@@ -230,9 +223,9 @@ impl MetapathMap {
         )
     }
 
-    fn encode(n: u16) -> [u8; 3] {
-        let mut buf = [0; 3];
-        base64::encode_config_slice(n.to_ne_bytes(), base64::STANDARD_NO_PAD, &mut buf);
+    fn encode(n: u16) -> NonPrefixedId {
+        let mut buf = [0; 4];
+        base64::encode_config_slice(n.to_ne_bytes(), base64::STANDARD_NO_PAD, &mut buf[1..]);
         buf
     }
 }
